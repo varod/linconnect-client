@@ -21,6 +21,9 @@ package com.willhauck.linconnectclient;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -53,19 +56,22 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
+import java.util.UUID;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceEvent;
 import javax.jmdns.ServiceListener;
-
-import de.cketti.library.changelog.ChangeLog;
 
 @SuppressWarnings("deprecation")
 public class SettingsActivity extends PreferenceActivity {
@@ -81,6 +87,7 @@ public class SettingsActivity extends PreferenceActivity {
 	// Preferences
 	Preference refreshPreference;
 	Preference loadingPreference;
+	Preference testBluetoothPreference;
 
 	// Preference Categories
 	static PreferenceCategory serverCategory;
@@ -88,11 +95,6 @@ public class SettingsActivity extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// Show changelog if needed
-		ChangeLog cl = new ChangeLog(this);
-		if (cl.isFirstRun()) {
-			cl.getLogDialog().show();
-		}
 		mWifiManager = (android.net.wifi.WifiManager) getSystemService(android.content.Context.WIFI_SERVICE);
 	}
 
@@ -135,6 +137,31 @@ public class SettingsActivity extends PreferenceActivity {
 		loadingPreference = ((Preference) findPreference("pref_loading"));
 		serverCategory.removePreference(loadingPreference);
 
+		// Fill Bluetooth adapters list
+		BluetoothAdapter BA;
+		BA = BluetoothAdapter.getDefaultAdapter();
+		if (BA.isEnabled())
+		{
+			Set<BluetoothDevice>pairedDevices;
+			pairedDevices = BA.getBondedDevices();
+
+			ListPreference btDeviceList = (ListPreference) findPreference("bt_device");
+			if (btDeviceList != null)
+			{
+				CharSequence[] devList = new String[pairedDevices.size()];
+				CharSequence[] devListValues = new String[pairedDevices.size()];
+				int i=0;
+				for(BluetoothDevice bt : pairedDevices)
+				{
+					devList[i]=bt.getName();
+					devListValues[i]=bt.getAddress();
+					i++;
+				}
+				btDeviceList.setEntries(devList);
+				btDeviceList.setEntryValues(devListValues);
+			}
+		}
+
 		Preference prefEnable = findPreference("pref_enable");
 		prefEnable
 				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
@@ -176,6 +203,23 @@ public class SettingsActivity extends PreferenceActivity {
 						new TestTask().execute(notif);
 
 						return true;
+					}
+				});
+
+		testBluetoothPreference = findPreference("pref_test_bt");
+		testBluetoothPreference
+				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+					@Override
+					public boolean onPreferenceClick(Preference arg0) {
+						// Create and send test notification
+                        SimpleDateFormat sf = new SimpleDateFormat("HH:mm:ss");
+                        Object[] notif = new Object[3];
+                        notif[0] = "Hello from Android!";
+                        notif[1] = "Test succesful @ " + sf.format(new Date());
+                        notif[2] = SettingsActivity.this.getResources().getDrawable(R.drawable.ic_launcher);
+                        new BluetoothTestTask().execute(notif);
+
+                        return true;
 					}
 				});
 
@@ -552,6 +596,98 @@ public class SettingsActivity extends PreferenceActivity {
 				Toast.makeText(
 						getApplicationContext(),
 						"Test notification not recieved. Ensure the server is updated to the latest version.",
+						Toast.LENGTH_LONG).show();
+			}
+
+		}
+	}
+
+	class BluetoothTestTask extends AsyncTask<Object, Void, Boolean> {
+		@SuppressLint("SimpleDateFormat")
+		@Override
+		protected Boolean doInBackground(Object... notif) {
+			BluetoothAdapter BA;
+			BA = BluetoothAdapter.getDefaultAdapter();
+			UUID uuid = UUID.fromString("ef466c25-8211-438a-9f39-b8ddecf1fbb8");
+			SharedPreferences prefs = PreferenceManager
+					.getDefaultSharedPreferences(getApplicationContext());
+			String BDStr = prefs.getString("bt_device", "None");
+			if (BA.isEnabled() && BDStr != "None") {
+				BluetoothDevice BD = BA.getRemoteDevice(BDStr);
+				try {
+					BluetoothSocket BS = BD.createInsecureRfcommSocketToServiceRecord(uuid);
+
+					// Create socket and get streams
+					BA.cancelDiscovery();
+					BS.connect();
+					InputStream in = null;
+					OutputStream out = null;
+					in = BS.getInputStream();
+					out = BS.getOutputStream();
+
+					// Create icon buffer
+					InputStream is = ImageUtilities.bitmapToInputStream(ImageUtilities.drawableToBitmap((Drawable) notif[2]));
+					byte[] iconBytes = new byte[is.available()];
+					is.read(iconBytes,0,is.available());
+
+					// Build notification header (without icon).
+					// JSON, because it's easy for logging on the server side.
+					JSONObject json = new JSONObject();
+					json.put("notificationheader",notif[0]);
+					json.put("notificationdescription",notif[1]);
+					json.put("iconsize",Integer.toString(iconBytes.length));
+					String dataStr = Base64.encodeToString(json.toString().getBytes("UTF-8"), Base64.URL_SAFE | Base64.NO_WRAP);
+
+					// Send header
+					out.write(dataStr.getBytes());
+
+					// Read answer to header
+					byte[] headerAnswerData = new byte[1024];
+					in.read(headerAnswerData);
+
+					// Answer was OK. Handle icon now.
+					String headerAnswer = new String(Base64.decode(headerAnswerData, Base64.URL_SAFE | Base64.NO_WRAP));
+					if (headerAnswer.equals("HEADEROK")) {
+						// Send the icon
+						out.write(iconBytes);
+
+						// Read answer to icon
+						byte[] iconAnswerData = new byte[1024];
+						in.read(iconAnswerData);
+
+						// Close socket
+						BS.close();
+
+						// Check if the answer was OK
+						String iconAnswer = new String(Base64.decode(iconAnswerData, Base64.URL_SAFE | Base64.NO_WRAP));
+						if (iconAnswer.equals("ICONOK"))
+							return true;
+						else
+							return false;
+					}
+					else {
+						// Close socket
+						BS.close();
+
+						return false;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			return false;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result) {
+			if (result == true) {
+				Toast.makeText(getApplicationContext(),
+						"Test notification received.", Toast.LENGTH_SHORT)
+						.show();
+			} else {
+				Toast.makeText(
+						getApplicationContext(),
+						"Test notification not received. Ensure the server is updated to the latest version.",
 						Toast.LENGTH_LONG).show();
 			}
 
