@@ -21,6 +21,9 @@ package com.willhauck.linconnectclient;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -43,16 +46,157 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.UUID;
 
 @SuppressWarnings("deprecation")
 public class NotificationUtilities {
 
     public static boolean sendData(Context c, Notification n, String packageName) {
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(c);
+
+        if (prefs.getBoolean("pref_toggle", false)
+                && prefs.getBoolean(packageName, true)) {
+
+            if (prefs.getBoolean("pref_method_wifi", false))
+                sendDataWifi(c,n,packageName);
+
+            if (prefs.getBoolean("pref_method_bt", false))
+                sendDataBluetooth(c,n,packageName);
+        }
+        return false;
+    }
+
+    public static boolean sendDataBluetooth(Context c, Notification n, String packageName) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
+
+        BluetoothAdapter BA;
+        BA = BluetoothAdapter.getDefaultAdapter();
+        UUID uuid = UUID.fromString("ef466c25-8211-438a-9f39-b8ddecf1fbb8");
+        String deviceStr = prefs.getString("bt_device", "None");
+        if (BA.isEnabled() && deviceStr != "None") {
+            BluetoothDevice BD = BA.getRemoteDevice(deviceStr);
+
+            // Magically extract text from notification
+            ArrayList<String> notificationData = NotificationUtilities.getNotificationText(n);
+
+            // Use PackageManager to get application name and icon
+            final PackageManager pm = c.getPackageManager();
+            ApplicationInfo ai;
+            try {
+                ai = pm.getApplicationInfo(packageName, 0);
+            } catch (final NameNotFoundException e) {
+                ai = null;
+            }
+
+            String notificationBody = "";
+            String notificationHeader = "";
+            // Create header and body of notification
+            if (notificationData.size() > 0) {
+                notificationHeader = notificationData.get(0);
+                if (notificationData.size() > 1) {
+                    notificationBody = notificationData.get(1);
+                }
+            } else {
+                return false;
+            }
+
+
+            for (int i = 2; i < notificationData.size(); i++) {
+                notificationBody += "\n" + notificationData.get(i);
+            }
+
+            // Append application name to body
+            if (pm.getApplicationLabel(ai) != null) {
+                if (notificationBody.isEmpty()) {
+                    notificationBody = "via " + pm.getApplicationLabel(ai);
+                } else {
+                    notificationBody += " (via " + pm.getApplicationLabel(ai) + ")";
+                }
+            }
+
+            // If the notification contains an icon, use it
+            InputStream is;
+            if (n.largeIcon != null) {
+                is = ImageUtilities.bitmapToInputStream(n.largeIcon);
+            }
+            // Otherwise, use the application's icon
+            else {
+                is = ImageUtilities.bitmapToInputStream(ImageUtilities.drawableToBitmap(pm.getApplicationIcon(ai)));
+            }
+
+			try {
+				BluetoothSocket BS = BD.createInsecureRfcommSocketToServiceRecord(uuid);
+
+				// Create socket and get streams
+				BA.cancelDiscovery();
+				BS.connect();
+				InputStream in = null;
+				OutputStream out = null;
+				in = BS.getInputStream();
+				out = BS.getOutputStream();
+
+				// Create icon buffer
+				byte[] iconBytes = new byte[is.available()];
+				is.read(iconBytes,0,is.available());
+
+				// Build notification header (without icon).
+				// JSON, because it's easy for logging on the server side.
+				JSONObject json = new JSONObject();
+				json.put("notificationheader",notificationHeader);
+				json.put("notificationdescription",notificationBody);
+				json.put("iconsize",Integer.toString(iconBytes.length));
+				String dataStr = Base64.encodeToString(json.toString().getBytes("UTF-8"), Base64.URL_SAFE | Base64.NO_WRAP);
+
+				// Send header
+				out.write(dataStr.getBytes());
+
+				// Read answer to header
+				byte[] headerAnswerData = new byte[1024];
+				in.read(headerAnswerData);
+
+				// Answer was OK. Handle icon now.
+				String headerAnswer = new String(Base64.decode(headerAnswerData, Base64.URL_SAFE | Base64.NO_WRAP));
+				if (headerAnswer.equals("HEADEROK")) {
+					// Send the icon
+					out.write(iconBytes);
+
+					// Read answer to icon
+					byte[] iconAnswerData = new byte[1024];
+					in.read(iconAnswerData);
+
+					// Close socket
+					BS.close();
+
+					// Check if the answer was OK
+					String iconAnswer = new String(Base64.decode(iconAnswerData, Base64.URL_SAFE | Base64.NO_WRAP));
+					if (iconAnswer.equals("ICONOK"))
+						return true;
+					else
+						return false;
+				}
+				else {
+					// Close socket
+					BS.close();
+
+					return false;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+        }
+        return false;
+    }
+
+    public static boolean sendDataWifi(Context c, Notification n, String packageName) {
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(c);
 
@@ -63,8 +207,7 @@ public class NotificationUtilities {
 
         // Check Wifi state, whether notifications are enabled globally, and
         // whether notifications are enabled for specific application
-        if (prefs.getBoolean("pref_toggle", true)
-                && prefs.getBoolean(packageName, true) && mWifi.isConnected()) {
+        if (mWifi.isConnected()) {
             String ip = prefs.getString("pref_ip", "0.0.0.0:9090");
 
             // Magically extract text from notification
