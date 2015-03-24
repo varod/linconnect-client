@@ -1,0 +1,9 @@
+/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/classes/debug
+/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-ee6adc1e6e7c1b1598b6e6d645f6a7d99d029778.jar
+/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/httpmime-4.3.1-1f4840d5bf3d548cd3b47ac9ee52af3944e4b33c.jar
+/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-9791a0db2ad9f9463754e77e498a24e2c303dab2.jar
+/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/jmdns-3.4.1-bf11d915d7407817694e8abb68fb2c13050f4870.jar
+/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/httpcore-4.3-090706b50f95248f5073c7ea0c99c32e4b074461.jar
+/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/commons-codec-1.6-1cceb36240d887a6b2c25076bf77d500ce012bf9.jar
+/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/httpclient-4.3.1-a3e999a94ef922c066fe103860d9944185cce798.jar
+/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/classes-34f4e44bf0d347bf6b9e94c8ab3aef8fd55c94f8.jar

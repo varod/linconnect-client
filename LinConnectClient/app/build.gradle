@@ -1,0 +1,34 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "com.willhauck.linconnectclient"
+        minSdkVersion 14
+        targetSdkVersion 19
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENCE'
+        exclude 'META-INF/LICENSE'
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:21.0.3'
+    compile files('libs/commons-codec-1.6.jar')
+    compile files('libs/httpclient-4.3.1.jar')
+    compile files('libs/httpcore-4.3.jar')
+    compile files('libs/httpmime-4.3.1.jar')
+    compile files('libs/jmdns-3.4.1.jar')
+}

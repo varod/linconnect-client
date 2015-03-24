@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="3"><dataSet config="21.0.3"><source path="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/assets"/></dataSet><dataSet config="main"><source path="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/src/main/assets"/></dataSet><dataSet config="debug"><source path="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/src/debug/assets"/></dataSet></merger>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/libs/jmdns-3.4.1.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="7ba2dcf7effb5ca9b00736b2a066fff3dd01d432">
+        <dex dex="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/jmdns-3.4.1-bf11d915d7407817694e8abb68fb2c13050f4870.jar" />
+    </item>
+    <item
+        jar="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/libs/httpclient-4.3.1.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="0171c67fa04952e76bc9ee1e578fe629db35d769">
+        <dex dex="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/httpclient-4.3.1-a3e999a94ef922c066fe103860d9944185cce798.jar" />
+    </item>
+    <item
+        jar="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
+        <dex dex="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/classes-34f4e44bf0d347bf6b9e94c8ab3aef8fd55c94f8.jar" />
+    </item>
+    <item
+        jar="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/libs/httpcore-4.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="8dfd6286d04ad9dbf26cdf7d4ef5c8fad430cf30">
+        <dex dex="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/httpcore-4.3-090706b50f95248f5073c7ea0c99c32e4b074461.jar" />
+    </item>
+    <item
+        jar="/usr/share/android-studio/data/sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.3/support-annotations-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
+        <dex dex="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-ee6adc1e6e7c1b1598b6e6d645f6a7d99d029778.jar" />
+    </item>
+    <item
+        jar="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/libs/commons-codec-1.6.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="b7f0fc8f61ecadeb3695f0b9464755eee44374d4">
+        <dex dex="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/commons-codec-1.6-1cceb36240d887a6b2c25076bf77d500ce012bf9.jar" />
+    </item>
+    <item
+        jar="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/libs/httpmime-4.3.1.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="f49e2348b768a7199e021a97e951df25cd5fb714">
+        <dex dex="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/httpmime-4.3.1-1f4840d5bf3d548cd3b47ac9ee52af3944e4b33c.jar" />
+    </item>
+    <item
+        jar="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
+        <dex dex="/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-9791a0db2ad9f9463754e77e498a24e2c303dab2.jar" />
+    </item>
+
+</items>

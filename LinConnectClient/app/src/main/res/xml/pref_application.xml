@@ -1,0 +1,12 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="header_application"
+        android:title="@string/header_application" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_all"
+            android:title="@string/pref_all" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

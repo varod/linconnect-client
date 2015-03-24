@@ -1,0 +1,103 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_toggle"
+        android:title="@string/pref_toggle" >
+    </CheckBoxPreference>
+
+    <PreferenceCategory android:title="@string/cat_setup" >
+        <Preference
+            android:key="pref_download"
+            android:summary="@string/pref_download_summary"
+            android:title="@string/pref_download" />
+        <Preference
+            android:key="pref_enable"
+            android:summary="@string/pref_enable_summary"
+            android:title="@string/pref_enable" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/cat_method" >
+        <CheckBoxPreference
+	        android:defaultValue="true"
+            android:key="pref_method_wifi"
+            android:disableDependentsState="false"
+            android:summary="@string/pref_method_wifi_summary"
+            android:title="@string/pref_method_wifi" />
+        <CheckBoxPreference
+	        android:defaultValue="false"
+            android:key="pref_method_bt"
+            android:disableDependentsState="false"
+            android:summary="@string/pref_method_bt_summary"
+            android:title="@string/pref_method_bt" />
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="cat_servers"
+        android:title="@string/cat_servers" >
+        <EditTextPreference
+            android:defaultValue="0.0.0.0:9090"
+            android:icon="@drawable/ic_checkmark"
+            android:key="pref_ip"
+            android:dependency="pref_method_wifi"
+            android:order="-1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/pref_ip" />
+
+        <Preference
+            android:key="pref_loading"
+            android:dependency="pref_method_wifi"
+            android:layout="@layout/pref_progress"
+            android:order="999" >
+        </Preference>
+        <Preference
+            android:icon="@drawable/ic_refresh"
+            android:key="pref_refresh"
+            android:dependency="pref_method_wifi"
+            android:order="999"
+            android:title="@string/pref_refresh" >
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/cat_bt_device" >
+        <ListPreference
+            android:key="bt_device"
+            android:dependency="pref_method_bt"
+            android:summary="@string/bt_device_summary"
+            android:title="@string/bt_device" />
+        <Preference
+            android:key="bt_launch_settings"
+            android:dependency="pref_method_bt"
+            android:summary="@string/pref_launch_bt_summary"
+            android:title="@string/pref_launch_bt" />
+        <Preference
+            android:key="pref_test_bt"
+            android:dependency="pref_method_bt"
+            android:summary="@string/test_bt_device_summary"
+            android:title="@string/test_bt_device" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/configuration" >
+        <Preference
+            android:key="pref_application"
+            android:summary="@string/pref_application_summary"
+            android:title="@string/pref_application" />
+        <Preference
+            android:enabled="false"
+            android:summary="@string/pref_additional_options_summary"
+            android:title="@string/pref_additional_options" >
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/information" >
+        <Preference
+            android:key="pref_google_plus"
+            android:summary="@string/pref_google_plus_summary"
+            android:title="@string/pref_google_plus" />
+        <Preference
+            android:key="pref_donate_play"
+            android:summary="@string/pref_donate_play_summary"
+            android:title="@string/pref_donate_play" />
+        <Preference
+            android:key="pref_donate_btc"
+            android:summary="@string/pref_donate_btc_summary"
+            android:title="@string/pref_donate_btc" />
+    </PreferenceCategory>
+
+</PreferenceScreen><!-- From: file:/home/vincent/Documents/perso/dev/android/LinConnect/LinConnectClient/app/src/main/res/xml/pref_general.xml -->
