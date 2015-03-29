@@ -161,37 +161,8 @@ public class ApplicationSettingsActivity extends PreferenceActivity {
 	class TestTask extends AsyncTask<Object, Void, Boolean> {
 		@Override
 		protected Boolean doInBackground(Object... notif) {
-			SharedPreferences prefs = PreferenceManager
-					.getDefaultSharedPreferences(getApplicationContext());
-			String ip = prefs.getString("pref_ip", "0.0.0.0:9090");
-
-			MultipartEntity entity = new MultipartEntity();
-			entity.addPart("notificon", new InputStreamBody(ImageUtilities.bitmapToInputStream(ImageUtilities.drawableToBitmap((Drawable) notif[2])), "drawable.png"));
-
-			HttpPost post = new HttpPost("http://" + ip + "/notif");
-			post.setEntity(entity);
-            try {
-                post.addHeader("notifheader", Base64.encodeToString(((String)notif[0]).getBytes("UTF-8"), Base64.URL_SAFE | Base64.NO_WRAP));
-                post.addHeader("notifdescription", Base64.encodeToString(((String)notif[1]).getBytes("UTF-8"), Base64.URL_SAFE|Base64.NO_WRAP));
-            } catch (UnsupportedEncodingException e) {
-                post.addHeader("notifheader", Base64.encodeToString(((String)notif[0]).getBytes(), Base64.URL_SAFE|Base64.NO_WRAP));
-                post.addHeader("notifdescription", Base64.encodeToString(((String)notif[1]).getBytes(), Base64.URL_SAFE|Base64.NO_WRAP));
-            }
-			
-			HttpClient client = new DefaultHttpClient();
-			HttpResponse response;
-			try {
-				response = client.execute(post);
-				String html = EntityUtils.toString(response.getEntity());
-				if (html.contains("true")) {
-					return true;
-				}
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return false;
+            LinconnectNotification linNotif = new LinconnectNotification((String)notif[0], (String)notif[1],ImageUtilities.drawableToBitmap((Drawable) notif[2]));
+            return NotificationUtilities.sendData(ApplicationSettingsActivity.this, linNotif);
 		}
 
 		@Override

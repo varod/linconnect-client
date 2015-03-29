@@ -66,20 +66,27 @@ public class NotificationUtilities {
     public static final UUID uuid = UUID.fromString("ef466c25-8211-438a-9f39-b8ddecf1fbb8");
     public static BluetoothAdapter BA = BluetoothAdapter.getDefaultAdapter();
 
-    public static boolean sendData(Context c, Notification n, String packageName) {
+    public static boolean sendData(Context c, LinconnectNotification linNotif){
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(c);
 
-        if (prefs.getBoolean("pref_toggle", false)
-                && prefs.getBoolean(packageName, true)) {
-
-            LinconnectNotification linNotif = new LinconnectNotification(n,c,packageName);
+        if (prefs.getBoolean("pref_toggle", false)) {
 
             if (prefs.getBoolean("pref_method_wifi", false))
-                sendDataWifi(c,linNotif);
+                return sendDataWifi(c,linNotif);
 
             if (prefs.getBoolean("pref_method_bt", false))
-                sendDataBluetooth(c,linNotif);
+                return sendDataBluetooth(c,linNotif);
+        }
+        return false;
+    }
+    public static boolean sendData(Context c, Notification n, String packageName) {
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(c);
+        //check if package allowed
+        if (prefs.getBoolean(packageName, true)) {
+            LinconnectNotification linNotif = new LinconnectNotification(n,c,packageName);
+           return sendData(c,linNotif);
         }
         return false;
     }
@@ -88,81 +95,91 @@ public class NotificationUtilities {
 
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(c);
-        Set<String> bt_devices = prefs.getStringSet("header_bluetooth", new HashSet<String>());
-        bt_devices.add(prefs.getString("bt_device", "None"));
+
         // Use PackageManager to get application name and icon
         final PackageManager pm = c.getPackageManager();
-        for (String deviceStr : bt_devices ){
-            //String deviceStr = prefs.getString("bt_device", "None");
 
-            Log.i("LINCONNECT-BT", "bt device : " + deviceStr);
+        Set<BluetoothDevice> pairedDevices;
+        pairedDevices = BA.getBondedDevices();
+        for(BluetoothDevice btDevice : pairedDevices ) {
+            if(prefs.getBoolean(btDevice.getAddress(),false))
+            {
+                Log.i("LINCONNECT-BT", "bt device : " + btDevice);
 
-            if (BA.isEnabled() && deviceStr != "None") {
-                BluetoothDevice BD = BA.getRemoteDevice(deviceStr);
+                if (BA.isEnabled()) {
+                    BluetoothDevice BD = BA.getRemoteDevice(btDevice.getAddress());
 
+                    BluetoothSocket BS = null;
+                    try {
+                        BS = BD.createInsecureRfcommSocketToServiceRecord(uuid);
 
-                try {
-                    BluetoothSocket BS = BD.createInsecureRfcommSocketToServiceRecord(uuid);
+                        // Create socket and get streams
+                        BA.cancelDiscovery();
+                        BS.connect();
+                        InputStream in = null;
+                        OutputStream out = null;
+                        in = BS.getInputStream();
+                        out = BS.getOutputStream();
+                        InputStream is = linNotif.getIconInputStream(c);
+                        // Create icon buffer
+                        byte[] iconBytes = new byte[is.available()];
+                        is.read(iconBytes,0,is.available());
 
-                    // Create socket and get streams
-                    BA.cancelDiscovery();
-                    BS.connect();
-                    InputStream in = null;
-                    OutputStream out = null;
-                    in = BS.getInputStream();
-                    out = BS.getOutputStream();
-                    InputStream is = linNotif.getIconInputStream(c);
-                    // Create icon buffer
-                    byte[] iconBytes = new byte[is.available()];
-                    is.read(iconBytes,0,is.available());
+                        // Build notification header (without icon).
+                        // JSON, because it's easy for logging on the server side.
+                        JSONObject json = new JSONObject();
+                        json.put("notificationheader",linNotif.getHeader());
+                        json.put("notificationdescription",linNotif.getDescription());
+                        json.put("iconsize",Integer.toString(iconBytes.length));
+                        String dataStr = Base64.encodeToString(json.toString().getBytes("UTF-8"), Base64.URL_SAFE | Base64.NO_WRAP);
 
-                    // Build notification header (without icon).
-                    // JSON, because it's easy for logging on the server side.
-                    JSONObject json = new JSONObject();
-                    json.put("notificationheader",linNotif.getHeader());
-                    json.put("notificationdescription",linNotif.getDescription());
-                    json.put("iconsize",Integer.toString(iconBytes.length));
-                    String dataStr = Base64.encodeToString(json.toString().getBytes("UTF-8"), Base64.URL_SAFE | Base64.NO_WRAP);
+                        // Send header
+                        out.write(dataStr.getBytes());
 
-                    // Send header
-                    out.write(dataStr.getBytes());
+                        // Read answer to header
+                        byte[] headerAnswerData = new byte[1024];
+                        in.read(headerAnswerData);
 
-                    // Read answer to header
-                    byte[] headerAnswerData = new byte[1024];
-                    in.read(headerAnswerData);
+                        // Answer was OK. Handle icon now.
+                        String headerAnswer = new String(Base64.decode(headerAnswerData, Base64.URL_SAFE | Base64.NO_WRAP));
+                        if (headerAnswer.equals("HEADEROK")) {
+                            // Send the icon
+                            out.write(iconBytes);
 
-                    // Answer was OK. Handle icon now.
-                    String headerAnswer = new String(Base64.decode(headerAnswerData, Base64.URL_SAFE | Base64.NO_WRAP));
-                    if (headerAnswer.equals("HEADEROK")) {
-                        // Send the icon
-                        out.write(iconBytes);
+                            // Read answer to icon
+                            byte[] iconAnswerData = new byte[1024];
+                            in.read(iconAnswerData);
 
-                        // Read answer to icon
-                        byte[] iconAnswerData = new byte[1024];
-                        in.read(iconAnswerData);
+                            // Close socket
+                            BS.close();
 
-                        // Close socket
-                        BS.close();
+                            // Check if the answer was OK
+                            String iconAnswer = new String(Base64.decode(iconAnswerData, Base64.URL_SAFE | Base64.NO_WRAP));
+                            if (iconAnswer.equals("ICONOK"))
+                                return true;
+                            else
+                                return false;
+                        }
+                        else {
+                            // Close socket
+                            BS.close();
 
-                        // Check if the answer was OK
-                        String iconAnswer = new String(Base64.decode(iconAnswerData, Base64.URL_SAFE | Base64.NO_WRAP));
-                        if (iconAnswer.equals("ICONOK"))
-                            return true;
-                        else
                             return false;
-                    }
-                    else {
-                        // Close socket
-                        BS.close();
+                        }
+                    } catch (Exception e) {
+                        if(BS != null)
+                            try {
+                                BS.close();
+                            }catch(IOException e2){
+                                e2.printStackTrace();
+                            }
 
-                        return false;
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
+
                 }
             }
         }
-
 
         return false;
     }

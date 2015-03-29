@@ -60,9 +60,11 @@ public class LinconnectNotification{
         if (pm.getApplicationLabel(ai) != null) {
             if (notificationBody.isEmpty()) {
                 notificationBody = "via " + pm.getApplicationLabel(ai);
-            } else {
-                notificationBody += " (via " + pm.getApplicationLabel(ai) + ")";
             }
+            /*
+            else {
+                notificationBody += " (via " + pm.getApplicationLabel(ai) + ")";
+            }*/
         }
 
         mHeader = notificationHeader;

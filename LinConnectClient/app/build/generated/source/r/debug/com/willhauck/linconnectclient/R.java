@@ -33,7 +33,7 @@ public final class R {
         public static final int bt_device_summary=0x7f060003;
         public static final int cat_bt_device=0x7f060004;
         public static final int cat_method=0x7f060005;
-        public static final int cat_methods=0x7f060028;
+        public static final int cat_methods=0x7f06002a;
         public static final int cat_servers=0x7f060006;
         public static final int cat_setup=0x7f060007;
         public static final int configuration=0x7f060008;
@@ -66,8 +66,10 @@ public final class R {
         public static final int pref_network_scan=0x7f060023;
         public static final int pref_refresh=0x7f060024;
         public static final int pref_toggle=0x7f060025;
-        public static final int test_bt_device=0x7f060026;
-        public static final int test_bt_device_summary=0x7f060027;
+        public static final int service_started=0x7f060026;
+        public static final int service_stopped=0x7f060027;
+        public static final int test_bt_device=0x7f060028;
+        public static final int test_bt_device_summary=0x7f060029;
     }
     public static final class style {
         /** 

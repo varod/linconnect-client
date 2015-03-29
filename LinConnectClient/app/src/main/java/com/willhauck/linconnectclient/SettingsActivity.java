@@ -137,31 +137,6 @@ public class SettingsActivity extends PreferenceActivity {
 		loadingPreference = ((Preference) findPreference("pref_loading"));
 		serverCategory.removePreference(loadingPreference);
 
-		// Fill Bluetooth adapters list
-		BluetoothAdapter BA;
-		BA = BluetoothAdapter.getDefaultAdapter();
-		if (BA != null && BA.isEnabled())
-		{
-			Set<BluetoothDevice>pairedDevices;
-			pairedDevices = BA.getBondedDevices();
-
-			ListPreference btDeviceList = (ListPreference) findPreference("bt_device");
-			if (btDeviceList != null)
-			{
-				CharSequence[] devList = new String[pairedDevices.size()];
-				CharSequence[] devListValues = new String[pairedDevices.size()];
-				int i=0;
-				for(BluetoothDevice bt : pairedDevices)
-				{
-					devList[i]=bt.getName();
-					devListValues[i]=bt.getAddress();
-					i++;
-				}
-				btDeviceList.setEntries(devList);
-				btDeviceList.setEntryValues(devListValues);
-			}
-		}
-
 		Preference prefEnable = findPreference("pref_enable");
 		prefEnable
 				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
