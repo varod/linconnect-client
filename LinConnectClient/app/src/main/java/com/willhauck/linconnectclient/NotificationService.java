@@ -24,13 +24,16 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class NotificationService extends NotificationListenerService {
+    public static final String ACTION_TOGGLE_NOTIF = "com.willhauck.linconnectclient.TOGGLE_NOTIF";
     private NotificationManager nm;
 
     @Override
@@ -42,6 +45,9 @@ public class NotificationService extends NotificationListenerService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("LinConnect", "Received start id " + startId + ": " + intent);
+        if(intent.getAction() == NotificationService.ACTION_TOGGLE_NOTIF)
+            this.toogleNotificationDisplay();
+
         return START_STICKY; // run until explicitly stopped.
     }
 	@Override
@@ -59,22 +65,50 @@ public class NotificationService extends NotificationListenerService {
         // In this sample, we'll use the same text for the ticker and the expanded notification
         CharSequence text = getText(R.string.service_started);
         // The PendingIntent to launch our activity if the user selects this notification
+
+        Intent toggleIntent = new Intent(this, NotificationService.class).setAction(NotificationService.ACTION_TOGGLE_NOTIF);
+        PendingIntent togglePendingIntent = PendingIntent.getService(this, 0, toggleIntent, 0);
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, SettingsActivity.class), 0);
-
         // Set the icon, scrolling text and timestamp
-        Notification notification = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setContentInfo(text)
-                .setContentTitle(getText(R.string.app_name))
-                .setContentIntent(contentIntent)
-                .addAction(R.drawable.ic_checkmark, "Activate notifcation", contentIntent)
-                .setTicker(text)
-                .build();
 
-        //TODO : add intent to stop/start linconnect notification
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+
+        Notification notification = null;
+
+        if(prefs.getBoolean("pref_toggle",false)) {
+            notification = new Notification.Builder(this)
+                    .setSmallIcon(R.drawable.ic_launcher)
+                    .setContentInfo(text)
+                    .setContentTitle(getText(R.string.app_name))
+                    .setContentIntent(contentIntent)
+                    .addAction(R.drawable.ic_refresh, "Stop nofification", togglePendingIntent)
+                    .setTicker(text)
+                    .build();
+
+        }
+        else{
+            notification = new Notification.Builder(this)
+                    .setSmallIcon(R.drawable.ic_computer)
+                    .setContentInfo(text)
+                    .setContentTitle(getText(R.string.app_name))
+                    .setContentIntent(contentIntent)
+                    .addAction(R.drawable.ic_refresh, "Start nofification", togglePendingIntent)
+                    .setTicker(text)
+                    .build();
+        }
+
 
         // Send the notification.
         // We use a layout id because it is a unique number.  We use it later to cancel.
         nm.notify(R.string.service_started, notification);
+    }
+
+    private void toogleNotificationDisplay(){
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(this);
+        Boolean toggle = prefs.getBoolean("pref_toggle", false);
+        prefs.edit().putBoolean("pref_toggle", !toggle).apply();
+        showNotification();
     }
 }
