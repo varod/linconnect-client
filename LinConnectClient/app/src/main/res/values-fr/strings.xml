@@ -43,5 +43,10 @@
     <!-- strings of xml/pref_application.xml -->
     <string name="header_application">Applications installées</string>
     <string name="pref_all">Sélectionner/déselectionner tout</string>
+    <string name="header_bluetooth">Appareils BT appairés</string>
+    <string name="pref_launch_bt">Préférences Bluetooth</string>
+    <string name="pref_launch_bt_summary">Appuyez ici pour sélection l'appareil bluetooth</string>
+    <string name="service_started">Service démarré</string>
+    <string name="service_stopped">Service stoppé</string>
 
 </resources>
