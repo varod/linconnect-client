@@ -168,14 +168,7 @@ public class SettingsActivity extends PreferenceActivity {
 
 						refreshServerList();
 
-						// Create and send test notification
-						SimpleDateFormat sf = new SimpleDateFormat("HH:mm:ss");
-						Object[] notif = new Object[3];
-						notif[0] = "Hello from Android!";
-						notif[1] = "Test succesful @ " + sf.format(new Date());
-						notif[2] = SettingsActivity.this.getResources()
-								.getDrawable(R.drawable.ic_launcher);
-						new TestTask().execute(notif);
+						new TestTask().execute(generateTestNotif());
 
 						return true;
 					}
@@ -199,17 +192,13 @@ public class SettingsActivity extends PreferenceActivity {
 				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 					@Override
 					public boolean onPreferenceClick(Preference arg0) {
-						// Create and send test notification
-                        SimpleDateFormat sf = new SimpleDateFormat("HH:mm:ss");
-                        Object[] notif = new Object[3];
-                        notif[0] = "Hello from Android!";
-                        notif[1] = "Test succesful @ " + sf.format(new Date());
-                        notif[2] = SettingsActivity.this.getResources().getDrawable(R.drawable.ic_launcher);
-                        new BluetoothTestTask().execute(notif);
+                        new BluetoothTestTask().execute(generateTestNotif());
 
                         return true;
 					}
-				});
+
+
+                });
 
 		Preference prefDownload = findPreference("pref_download");
 		prefDownload
@@ -345,18 +334,7 @@ public class SettingsActivity extends PreferenceActivity {
 							e.putString("pref_ip", arg0.getSummary().toString());
 							e.apply();
 
-							// Create and send test notification
-							SimpleDateFormat sf = new SimpleDateFormat(
-									"HH:mm:ss");
-
-							Object[] notif = new Object[3];
-							notif[0] = "Hello from Android!";
-							notif[1] = "Test succesful @ "
-									+ sf.format(new Date());
-							notif[2] = SettingsActivity.this.getResources()
-									.getDrawable(R.drawable.ic_launcher);
-
-							new TestTask().execute(notif);
+							new TestTask().execute(generateTestNotif());
 
 							return true;
 						}
@@ -500,6 +478,16 @@ public class SettingsActivity extends PreferenceActivity {
 		new ServerScanTask().execute();
 	}
 
+    private Object[] generateTestNotif() {
+        // Create and send test notification
+        SimpleDateFormat sf = new SimpleDateFormat("HH:mm:ss");
+        Object[] notif = new Object[3];
+        notif[0] = getText(R.string.pref_test_notif1);
+        notif[1] = getText(R.string.pref_test_notif2) + sf.format(new Date());
+        notif[2] = SettingsActivity.this.getResources().getDrawable(R.drawable.ic_launcher);
+        return notif;
+    }
+
 	private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object value) {
@@ -530,6 +518,7 @@ public class SettingsActivity extends PreferenceActivity {
 						""));
 	}
 
+
 	class TestTask extends AsyncTask<Object, Void, Boolean> {
 		@SuppressLint("SimpleDateFormat")
 		@Override
@@ -545,12 +534,12 @@ public class SettingsActivity extends PreferenceActivity {
 		protected void onPostExecute(Boolean result) {
 			if (result == true) {
 				Toast.makeText(getApplicationContext(),
-						"Test notification recieved.", Toast.LENGTH_SHORT)
+						getText(R.string.pref_test_notif_recieved), Toast.LENGTH_SHORT)
 						.show();
 			} else {
 				Toast.makeText(
 						getApplicationContext(),
-						"Test notification not recieved. Ensure the server is updated to the latest version.",
+						getText(R.string.pref_test_notif_not_recieved),
 						Toast.LENGTH_LONG).show();
 			}
 

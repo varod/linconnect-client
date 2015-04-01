@@ -25,6 +25,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.service.notification.NotificationListenerService;
@@ -62,6 +63,8 @@ public class NotificationService extends NotificationListenerService {
 
     private void showNotification() {
         nm = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+
         // In this sample, we'll use the same text for the ticker and the expanded notification
         CharSequence text = getText(R.string.service_started);
         // The PendingIntent to launch our activity if the user selects this notification
@@ -82,7 +85,7 @@ public class NotificationService extends NotificationListenerService {
                     .setContentInfo(text)
                     .setContentTitle(getText(R.string.app_name))
                     .setContentIntent(contentIntent)
-                    .addAction(R.drawable.ic_refresh, "Stop nofification", togglePendingIntent)
+                    .addAction(R.drawable.ic_refresh, getText(R.string.service_stop_notif), togglePendingIntent)
                     .setTicker(text)
                     .build();
 
@@ -93,7 +96,7 @@ public class NotificationService extends NotificationListenerService {
                     .setContentInfo(text)
                     .setContentTitle(getText(R.string.app_name))
                     .setContentIntent(contentIntent)
-                    .addAction(R.drawable.ic_refresh, "Start nofification", togglePendingIntent)
+                    .addAction(R.drawable.ic_refresh, getText(R.string.service_start_notif), togglePendingIntent)
                     .setTicker(text)
                     .build();
         }

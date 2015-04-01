@@ -45,8 +45,14 @@
     <string name="pref_all">Sélectionner/déselectionner tout</string>
     <string name="header_bluetooth">Appareils BT appairés</string>
     <string name="pref_launch_bt">Préférences Bluetooth</string>
-    <string name="pref_launch_bt_summary">Appuyez ici pour sélection l'appareil bluetooth</string>
+    <string name="pref_launch_bt_summary">Appuyez ici pour sélection l\'appareil bluetooth</string>
     <string name="service_started">Service démarré</string>
     <string name="service_stopped">Service stoppé</string>
+    <string name="service_start_notif">Démarrer les notifications</string>
+    <string name="service_stop_notif">Arrêter les notifications</string>
+    <string name="pref_test_notif1">Bonjour depuis Android !</string>
+    <string name="pref_test_notif2">Test réussi @ </string>
+    <string name="pref_test_notif_not_recieved">La notification de test n\'a pas été reçue. Assurez vous que le serveur est à jour</string>
+    <string name="pref_test_notif_recieved">La notification de test a été correctement reçue</string>
 
 </resources>

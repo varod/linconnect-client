@@ -40,7 +40,10 @@
     <string name="pref_donate_play_summary">Tap here to donate by purchasing Donation Key</string>
     <string name="pref_donate_btc">Donate via Bitcoin</string>
     <string name="pref_donate_btc_summary">Tap here to donate via Bitcoin</string>
-    
+    <string name="pref_test_notif1">Hello from Android !</string>
+    <string name="pref_test_notif2">Test succesful @ </string>
+    <string name="pref_test_notif_recieved">Test notification recieved</string>
+    <string name="pref_test_notif_not_recieved">Test notification not recieved. Ensure the server is updated to the latest version.</string>
     <!-- strings of xml/pref_application.xml -->
     <string name="header_application">Installed Applications</string>
     <string name="pref_all">Check/uncheck all</string>
@@ -49,4 +52,6 @@
     <string name="header_bluetooth">Paired BT devices</string>
     <string name="service_started">Service started</string>
     <string name="service_stopped">Service stopped</string>
+    <string name="service_stop_notif">Stop notification</string>
+    <string name="service_start_notif">Start notification</string>
 </resources>

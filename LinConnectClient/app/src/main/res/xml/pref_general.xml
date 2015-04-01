@@ -58,11 +58,6 @@
         </Preference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/cat_bt_device" >
-        <ListPreference
-            android:key="bt_device"
-            android:dependency="pref_method_bt"
-            android:summary="@string/bt_device_summary"
-            android:title="@string/bt_device" />
         <Preference
             android:key="bt_launch_settings"
             android:dependency="pref_method_bt"
