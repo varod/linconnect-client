@@ -25,7 +25,6 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.service.notification.NotificationListenerService;
@@ -46,7 +45,7 @@ public class NotificationService extends NotificationListenerService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i("LinConnect", "Received start id " + startId + ": " + intent);
-        if(intent.getAction() == NotificationService.ACTION_TOGGLE_NOTIF)
+        if(intent.getAction().equals(NotificationService.ACTION_TOGGLE_NOTIF))
             this.toogleNotificationDisplay();
 
         return START_STICKY; // run until explicitly stopped.
@@ -77,7 +76,7 @@ public class NotificationService extends NotificationListenerService {
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(this);
 
-        Notification notification = null;
+        Notification notification;
 
         if(prefs.getBoolean("pref_toggle",false)) {
             notification = new Notification.Builder(this)
@@ -104,6 +103,7 @@ public class NotificationService extends NotificationListenerService {
 
         // Send the notification.
         // We use a layout id because it is a unique number.  We use it later to cancel.
+        notification.flags |= Notification.FLAG_NO_CLEAR;
         nm.notify(R.string.service_started, notification);
     }
 
